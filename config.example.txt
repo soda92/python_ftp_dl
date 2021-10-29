@@ -1,4 +1,4 @@
-#存储目录, 默认为`当前目录/data`
+#存储目录, 默认为`运行目录/data`
 dest=
 #服务器列表, 格式: name,ip,username,password
 test-server,192.168.1.79,toybrick,toybrick

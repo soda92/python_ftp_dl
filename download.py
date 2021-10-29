@@ -6,6 +6,8 @@ import time
 import sys
 
 CURR_DIR = Path(getcwd())
+with open("download.log", mode='w', encoding='utf-8') as f:
+    f.write("")
 
 
 def read_config():
@@ -35,9 +37,9 @@ def read_config():
 
 
 def dl_(dest, ftp):
-    start_time = time.time()
-    ftp.cwd('/home/toybrick/lamp_sample')
+    ftp.cwd('lamp_sample')
     for directory in ftp.nlst():
+        start_time = time.time()
         local_dir = Path.joinpath(dest, server_config['name'], directory)
         if not local_dir.is_dir():
             local_dir.mkdir(parents=True)
@@ -45,15 +47,22 @@ def dl_(dest, ftp):
 
         filenames = ftp.nlst()
         for i, filename in enumerate(filenames):
-            # print(f"retriving: {i}/{len(filenames)}")
             local_file = Path.joinpath(local_dir, filename)
             if local_file.is_file():
+                print(
+                    f"skipped: {server_config['name']}/{directory} {i+1}/{len(filenames)}")
+                sys.stdout.flush()
                 continue
+            print(
+                f"retriving: {server_config['name']}/{directory} {i+1}/{len(filenames)}")
+            sys.stdout.flush()
+
             with open(local_file, mode='wb') as f:
                 ftp.retrbinary('RETR ' + filename, f.write)
         ftp.cwd('..')
-    print("function cost {:.3f} seconds".format(time.time() - start_time))
-    sys.stdout.flush()
+        with open("download.log", encoding="utf8", mode="a") as f:
+            f.write("function cost {:.3f} seconds\n".format(
+                time.time() - start_time))
 
 
 def dl(dest, server_config):
