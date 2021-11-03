@@ -39,7 +39,6 @@ def read_config():
 def dl_(dest, ftp):
     ftp.cwd('lamp_sample')
     for directory in ftp.nlst():
-        start_time = time.time()
         local_dir = Path.joinpath(dest, server_config['name'], directory)
         if not local_dir.is_dir():
             local_dir.mkdir(parents=True)
@@ -60,9 +59,6 @@ def dl_(dest, ftp):
             with open(local_file, mode='wb') as f:
                 ftp.retrbinary('RETR ' + filename, f.write)
         ftp.cwd('..')
-        with open("download.log", encoding="utf8", mode="a") as f:
-            f.write("function cost {:.3f} seconds\n".format(
-                time.time() - start_time))
 
 
 def dl(dest, server_config):
@@ -77,6 +73,8 @@ def dl(dest, server_config):
 
 
 if __name__ == '__main__':
+    start_time = time.time()
     dest, server_list = read_config()
     for server_config in server_list:
         dl(dest, server_config)
+    print("it cost {:.2f} seconds\n".format(time.time() - start_time))
