@@ -4,3 +4,4 @@
 /dist
 __pycache__
 /build
+server_config.py

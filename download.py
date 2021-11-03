@@ -4,10 +4,12 @@ from os import getcwd
 from pathlib import Path
 import time
 import sys
+import logging
+
+logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p',
+                    filename='download.log', encoding='utf-8', level=logging.DEBUG)
 
 CURR_DIR = Path(getcwd())
-with open("download.log", mode='w', encoding='utf-8') as f:
-    f.write("")
 
 
 def read_config():
@@ -48,11 +50,11 @@ def dl_(dest, ftp):
         for i, filename in enumerate(filenames):
             local_file = Path.joinpath(local_dir, filename)
             if local_file.is_file():
-                print(
+                logging.debug(
                     f"skipped: {server_config['name']}/{directory} {i+1}/{len(filenames)}")
                 sys.stdout.flush()
                 continue
-            print(
+            logging.debug(
                 f"retriving: {server_config['name']}/{directory} {i+1}/{len(filenames)}")
             sys.stdout.flush()
 
@@ -64,9 +66,10 @@ def dl_(dest, ftp):
 def dl(dest, server_config):
     dest = Path(dest)
     dest.mkdir(parents=True, exist_ok=True)
-
+    logging.info("connecting to server...")
     with FTP(host=server_config['host']) as ftp:
         ftp.login(user=server_config['user'], passwd=server_config['passwd'])
+        logging.info("connected")
         dl_(dest=dest, ftp=ftp)
 
 # %%
@@ -77,4 +80,4 @@ if __name__ == '__main__':
     dest, server_list = read_config()
     for server_config in server_list:
         dl(dest, server_config)
-    print("it cost {:.2f} seconds\n".format(time.time() - start_time))
+    logging.info("it cost {:.2f} seconds\n".format(time.time() - start_time))
